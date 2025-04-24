@@ -6,7 +6,7 @@ let b:jumptree_loaded = 1
 
 
 function s:sync()
-  " yeet the cursor to wherever, so Neovim doesn't sneakily remove the latest jumplist
+  " yeet the cursor to wherever, so Neovim doesn't sneakily remove the last jumplist
   " entry when querying the jumplist. see src/nvim/mark.c:1196-1207, commit 5eca52aa
   let l:cursor_save = getcurpos('.')
   call setpos('.', [0, line('w$'), 0, 0])
@@ -73,17 +73,17 @@ endfunction
 
 
 let w:jumptree = [] | let w:jumptree_idx = 0 | let w:jumptree_float = 0
-autocmd WinEnter * let w:jumptree = [] | let w:jumptree_idx = 0 | let w:jumptree_float = 0
+autocmd WinNew * let w:jumptree = [] | let w:jumptree_idx = 0 | let w:jumptree_float = 0
 autocmd BufNew,BufEnter,CursorMoved * call s:sync()
 
-nnoremap <plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
-nnoremap <plug>JumptreeDown  <cmd>call <sid>do(function('<sid>down'))<cr>
-nnoremap <plug>JumptreeOlder <cmd>call <sid>do(function('<sid>older'))<cr>
-nnoremap <plug>JumptreeNewer <cmd>call <sid>do(function('<sid>newer'))<cr>
+nnoremap <Plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
+nnoremap <Plug>JumptreeDown  <cmd>call <sid>do(function('<sid>down'))<cr>
+nnoremap <Plug>JumptreeOlder <cmd>call <sid>do(function('<sid>older'))<cr>
+nnoremap <Plug>JumptreeNewer <cmd>call <sid>do(function('<sid>newer'))<cr>
 
 if !exists('g:jumptree_no_mappings') || !g:jumptree_no_mappings
-  nnoremap <c-o>  <plug>JumptreeUp
-  nnoremap <c-i>  <plug>JumptreeDown
-  nnoremap g<c-o> <plug>JumptreeOlder
-  nnoremap g<c-i> <plug>JumptreeNewer
+  nnoremap <c-o>  <Plug>JumptreeUp
+  nnoremap <c-i>  <Plug>JumptreeDown
+  nnoremap g<c-o> <Plug>JumptreeOlder
+  nnoremap g<c-i> <Plug>JumptreeNewer
 endif
