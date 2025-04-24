@@ -2,14 +2,14 @@ if exists('g:jumptree_loaded')
   finish
 endif
 
-let b:jumptree_loaded = 1
+let g:jumptree_loaded = 1
 
 
 function s:sync()
   " yeet the cursor to wherever, so Neovim doesn't sneakily remove the last jumplist
   " entry when querying the jumplist. see src/nvim/mark.c:1196-1207, commit 5eca52aa
   let l:cursor_save = getcurpos('.')
-  call setpos('.', [0, line('w$'), 0, 0])
+  call setpos('.', [0, line('$') - 1, 0, 0])
 
   let l:loc = getjumplist()[0][-1]
   let l:loc = [l:loc.bufnr, l:loc.lnum, l:loc.col + 1, l:loc.coladd]
