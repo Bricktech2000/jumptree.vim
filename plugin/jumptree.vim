@@ -17,12 +17,20 @@ function s:getjumplist(...)
   return jumplist
 endfunction
 
-function s:sync()
-  if empty(w:jumptree)
+function s:initvars()
+  " creating windown variables using `autocmd WinNew *` is just not reliable
+  " (case in point, `vimdiff`), so instead we defensively call this function
+  " before using any window variables to create them if they haven't yet been
+  if !exists('w:jumptree') || empty(w:jumptree)
+    let [w:jumptree_idx, w:jumptree_flt] = [0, 0]
     let w:jumptree = [{'loc': getpos('.')}]
     let w:jumptree[0].loc[0] = bufnr()
     return
   endif
+endfunction
+
+function s:sync()
+  call s:initvars()
 
   let loc = s:getjumplist()[0][-1]
   let loc = [loc.bufnr, loc.lnum, loc.col + 1, loc.coladd]
@@ -36,6 +44,8 @@ function s:sync()
 endfunction
 
 function s:do(move)
+  call s:initvars()
+
   " if cursor is floating (as in, this is the first <c-o>/<c-i>/g<c-o>/g<c-i>
   " after a jump), commit the current cursor position to the jumptree. same
   " idea as src/nvim/mark.c:300, commit 9884ba70
@@ -79,8 +89,6 @@ function s:newer()
   endif
 endfunction
 
-let [w:jumptree, w:jumptree_idx, w:jumptree_flt] = [[], 0, 0]
-autocmd WinNew * let [w:jumptree, w:jumptree_idx, w:jumptree_flt] = [[], 0, 0]
 autocmd BufEnter,CursorMoved * call s:sync()
 
 nnoremap <Plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
