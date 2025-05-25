@@ -11,14 +11,17 @@ function s:getjumplist(...)
   " because otherwise Neovim permanently deletes that entry when viewing the
   " jumplist. see src/nvim/mark.c:1196-1207, commit 5eca52aa
   let curpos = getcurpos()
-  call setpos('.', [0, line("''") % line('$') + 1, 0, 0])
+  call cursor(line("''") % line('$') + 1, 0)
   let jumplist = call('getjumplist', a:000)
   call setpos('.', curpos)
+  " for some reason, `autocmd CursorMoved * call setpos('.', getcurpos())`
+  " breaks the '$' binding in blockwise visual mode |v_$|. this fixes it up
+  if curpos[4] == v:maxcol | execute 'normal! $' | endif
   return jumplist
 endfunction
 
 function s:initvars()
-  " creating windown variables using `autocmd WinNew *` is just not reliable
+  " creating window variables using `autocmd WinNew *` is just not reliable
   " (case in point, `vimdiff`), so instead we defensively call this function
   " before using any window variables to create them if they haven't yet been
   if !exists('w:jumptree') || empty(w:jumptree)
