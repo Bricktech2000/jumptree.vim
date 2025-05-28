@@ -6,7 +6,7 @@ let g:loaded_jumptree = 1
 let s:cpo_save = &cpo
 set cpo&vim
 
-function s:getjumplist(...)
+function! s:getjumplist(...)
   " make sure the cursor is not on the same line as the last jumplist entry,
   " because otherwise Neovim permanently deletes that entry when viewing the
   " jumplist. see src/nvim/mark.c:1196-1207, commit 5eca52aa
@@ -20,33 +20,36 @@ function s:getjumplist(...)
   return jumplist
 endfunction
 
-function s:initvars()
+function! s:initvars()
   " creating window variables using `autocmd WinNew *` is just not reliable
   " (case in point, `vimdiff`), so instead we defensively call this function
   " before using any window variables to create them if they haven't yet been
   if !exists('w:jumptree') || empty(w:jumptree)
-    let [w:jumptree_idx, w:jumptree_flt] = [0, 0]
+    let [w:jumptree_idx, w:jumptree_flt, w:jumptree_last] = [0, 0, []]
     let w:jumptree = [{'loc': getpos('.')}]
     let w:jumptree[0].loc[0] = bufnr()
     return
   endif
 endfunction
 
-function s:sync()
+function! s:sync()
   call s:initvars()
 
   let loc = s:getjumplist()[0][-1]
   let loc = [loc.bufnr, loc.lnum, loc.col + 1, loc.coladd]
-  if loc != w:jumptree[-1].loc " jumplist has a new entry
-    let w:jumptree_flt = 1 " mark cursor as floating
-    if loc != w:jumptree[w:jumptree_idx].loc " deduplicate
+  if loc != w:jumptree_last " jumplist has a new entry; a jump has occurred
+    let w:jumptree_last = loc
+    let w:jumptree_flt = 1
+    " add the new jumplist entry to the jumptree, if it's not a duplicate of
+    " its parent. this check is a human-friendliness thing and can be removed
+    if loc != w:jumptree[w:jumptree_idx].loc
       call add(w:jumptree, {'loc': loc, 'up': w:jumptree_idx})
       let w:jumptree_idx = len(w:jumptree) - 1
     endif
   endif
 endfunction
 
-function s:do(move)
+function! s:do(move)
   call s:initvars()
 
   " if cursor is floating (as in, this is the first <c-o>/<c-i>/g<c-o>/g<c-i>
@@ -65,7 +68,7 @@ function s:do(move)
   call setpos('.', cur.loc)
 endfunction
 
-function s:up()
+function! s:up()
   let cur = w:jumptree[w:jumptree_idx]
   if has_key(cur, 'up')
     let w:jumptree[cur.up].down = w:jumptree_idx
@@ -73,20 +76,20 @@ function s:up()
   endif
 endfunction
 
-function s:down()
+function! s:down()
   let cur = w:jumptree[w:jumptree_idx]
   if has_key(cur, 'down')
     let w:jumptree_idx = cur.down
   endif
 endfunction
 
-function s:older()
+function! s:older()
   if w:jumptree_idx > 0
     let w:jumptree_idx -= 1
   endif
 endfunction
 
-function s:newer()
+function! s:newer()
   if w:jumptree_idx < len(w:jumptree) - 1
     let w:jumptree_idx += 1
   endif
