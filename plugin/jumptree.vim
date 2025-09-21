@@ -9,7 +9,7 @@ set cpo&vim
 function! s:getjumplist(...)
   " make sure the cursor is not on the same line as the last jumplist entry,
   " because otherwise Neovim permanently deletes that entry when viewing the
-  " jumplist. see src/nvim/mark.c:1196-1207, commit 5eca52aa
+  " jumplist. see src/nvim/mark.c:1196-1207 as of commit 5eca52aa
   let curpos = getcurpos()
   call cursor(line("''") % line('$') + 1, 0)
   let jumplist = call('getjumplist', a:000)
@@ -38,14 +38,16 @@ function! s:sync()
   let loc = s:getjumplist()[0][-1]
   let loc = [loc.bufnr, loc.lnum, loc.col + 1, loc.coladd]
   if loc != w:jumptree_last " jumplist has a new entry; a jump has occurred
-    let w:jumptree_last = loc
-    let w:jumptree_flt = 1
     " add the new jumplist entry to the jumptree, if it's not a duplicate of
-    " its parent. this check is a human-friendliness thing and can be removed
-    if loc != w:jumptree[w:jumptree_idx].loc
+    " its parent. without this check, performing a jump immediately after a
+    " <c-o>/<c-i>/g<c-o>/g<c-i> would duplicate the jump source. though when
+    " the cursor is floating, bypass the check
+    if loc != w:jumptree[w:jumptree_idx].loc || w:jumptree_flt
       call add(w:jumptree, {'loc': loc, 'up': w:jumptree_idx})
       let w:jumptree_idx = len(w:jumptree) - 1
     endif
+    let w:jumptree_last = loc
+    let w:jumptree_flt = 1
   endif
 endfunction
 
@@ -54,9 +56,10 @@ function! s:do(move)
 
   " if cursor is floating (as in, this is the first <c-o>/<c-i>/g<c-o>/g<c-i>
   " after a jump), commit the current cursor position to the jumptree. same
-  " idea as src/nvim/mark.c:300, commit 9884ba70
+  " idea as src/nvim/mark.c:300 as of commit 9884ba70
   if w:jumptree_flt
     normal! m'
+    let w:jumptree_last = [] " force-update
     call s:sync()
     let w:jumptree_flt = 0
   endif
@@ -96,6 +99,10 @@ function! s:newer()
 endfunction
 
 autocmd BufEnter,CursorMoved * call s:sync()
+nnoremap m' m'<cmd>doautocmd CursorMoved<cr>
+xnoremap m' m'<cmd>doautocmd CursorMoved<cr>
+nnoremap m` m`<cmd>doautocmd CursorMoved<cr>
+xnoremap m` m`<cmd>doautocmd CursorMoved<cr>
 
 nnoremap <Plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
 nnoremap <Plug>JumptreeDown  <cmd>call <sid>do(function('<sid>down'))<cr>
