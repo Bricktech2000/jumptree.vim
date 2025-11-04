@@ -15,10 +15,10 @@ The mappings provided are best illustrated as a correspondence between them and 
 
 |                       | Jumptree Default | “Stack” Jumplist | Classic Jumplist | Undo Tree Analogue |
 | --------------------- | ---------------- | ---------------- | ---------------- | ------------------ |
-| `<Plug>JumptreeUp`    | `CTRL-O`         | `CTRL-O`         |                  | `u`                |
-| `<Plug>JumptreeDown`  | `CTRL-I`         | `CTRL-I`         |                  | `CTRL-R`           |
-| `<Plug>JumptreeOlder` | `g CTRL-O`       |                  | `CTRL-O`         | `g-`               |
-| `<Plug>JumptreeNewer` | `g CTRL-I`       |                  | `CTRL-I`         | `g+`               |
+| `<Plug>JumptreeUp`    | `CTRL‑O`         | `CTRL‑O`         |                  | `u`                |
+| `<Plug>JumptreeDown`  | `CTRL‑I`         | `CTRL‑I`         |                  | `CTRL‑R`           |
+| `<Plug>JumptreeOlder` | `g CTRL‑O`       |                  | `CTRL‑O`         | `g-`               |
+| `<Plug>JumptreeNewer` | `g CTRL‑I`       |                  | `CTRL‑I`         | `g+`               |
 
 Default mappings can be disabled with
 

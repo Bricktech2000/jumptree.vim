@@ -104,17 +104,19 @@ xnoremap m' m'<cmd>doautocmd CursorMoved<cr>
 nnoremap m` m`<cmd>doautocmd CursorMoved<cr>
 xnoremap m` m`<cmd>doautocmd CursorMoved<cr>
 
-nnoremap <Plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
-nnoremap <Plug>JumptreeDown  <cmd>call <sid>do(function('<sid>down'))<cr>
-nnoremap <Plug>JumptreeOlder <cmd>call <sid>do(function('<sid>older'))<cr>
-nnoremap <Plug>JumptreeNewer <cmd>call <sid>do(function('<sid>newer'))<cr>
+nnoremap <plug>JumptreeUp    <cmd>call <sid>do(function('<sid>up'))<cr>
+nnoremap <plug>JumptreeDown  <cmd>call <sid>do(function('<sid>down'))<cr>
+nnoremap <plug>JumptreeOlder <cmd>call <sid>do(function('<sid>older'))<cr>
+nnoremap <plug>JumptreeNewer <cmd>call <sid>do(function('<sid>newer'))<cr>
 
 if !exists('g:jumptree_no_mappings') || !g:jumptree_no_mappings
-  nnoremap <c-o>  <Plug>JumptreeUp
-  nnoremap <c-i>  <Plug>JumptreeDown
-  nnoremap g<c-o> <Plug>JumptreeOlder
-  nnoremap g<c-i> <Plug>JumptreeNewer
+  nnoremap <c-o>  <plug>JumptreeUp
+  nnoremap <c-i>  <plug>JumptreeDown
+  nnoremap g<c-o> <plug>JumptreeOlder
+  nnoremap g<c-i> <plug>JumptreeNewer
 endif
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
+
+" vim:tw=78:
