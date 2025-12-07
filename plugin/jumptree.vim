@@ -55,8 +55,8 @@ function! s:do(move)
   call s:initvars()
 
   " if cursor is floating (as in, this is the first <c-o>/<c-i>/g<c-o>/g<c-i>
-  " after a jump), commit the current cursor position to the jumptree. same
-  " idea as src/nvim/mark.c:300 as of commit 9884ba70
+  " after a jump), commit the current cursor position to the jumptree. same idea
+  " as src/nvim/mark.c:300 as of commit 9884ba70
   if w:jumptree_flt
     normal! m'
     let w:jumptree_last = [] " force-update
@@ -119,4 +119,4 @@ endif
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
-" vim:tw=78:
+" vim:tw=80:
