@@ -7,9 +7,10 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 function! s:getjumplist(...)
+  if !has('nvim-0.4.0') | return call('getjumplist', a:000) | endif
   " make sure the cursor is not on the same line as the last jumplist entry,
   " because otherwise Neovim permanently deletes that entry when viewing the
-  " jumplist. see src/nvim/mark.c:1196-1207 as of commit 5eca52aa
+  " jumplist. see src/nvim/mark.c:1196-1207 as of commit 35362495c9
   let curpos = getcurpos()
   call cursor(line("''") % line('$') + 1, 0)
   let jumplist = call('getjumplist', a:000)
@@ -56,7 +57,7 @@ function! s:do(move)
 
   " if cursor is floating (as in, this is the first <c-o>/<c-i>/g<c-o>/g<c-i>
   " after a jump), commit the current cursor position to the jumptree. same idea
-  " as src/nvim/mark.c:300 as of commit 9884ba70
+  " as src/nvim/mark.c:300 as of commit 72cf89bce8
   if w:jumptree_flt
     normal! m'
     let w:jumptree_last = [] " force-update
