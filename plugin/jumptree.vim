@@ -27,7 +27,7 @@ function! s:initvars()
   " before using any window variables to create them if they haven't yet been
   if !exists('w:jumptree') || empty(w:jumptree)
     let [w:jumptree_idx, w:jumptree_flt, w:jumptree_last] = [0, 0, []]
-    let w:jumptree = [{'loc': getcurpos()}]
+    let w:jumptree = [{'loc': getpos('.')}]
     let w:jumptree[0].loc[0] = bufnr()
     return
   endif
@@ -37,7 +37,7 @@ function! s:sync()
   call s:initvars()
 
   let loc = s:getjumplist()[0][-1]
-  let loc = [loc.bufnr, loc.lnum, loc.col + 1, loc.coladd, loc.col + 1]
+  let loc = [loc.bufnr, loc.lnum, loc.col + 1, loc.coladd]
   if loc != w:jumptree_last " jumplist has a new entry; a jump has occurred
     " add the new jumplist entry to the jumptree, if it's not a duplicate of
     " its parent. without this check, performing a jump immediately after a
@@ -67,9 +67,14 @@ function! s:do(move)
 
   for _ in range(v:count1) | call a:move() | endfor
 
+  " we use `cursor([lnum, col, off])` without a `curswant` so that the curswant
+  " gets set to `col` converted to a virtual column. `setpos('.', [0, lnum, col,
+  " off])` doesn't set a curswant so the curswant remains whatever it was before
+  " the jump. `setpos('.', [0, lnum, col, off, curswant])` with `curswant = col`
+  " wouldn't work because `col` is a byte position, not a virtual column number
   let cur = w:jumptree[w:jumptree_idx]
   execute 'keepjumps' 'buffer' cur.loc[0]
-  call setpos('.', cur.loc)
+  call cursor(cur.loc[1:])
 endfunction
 
 function! s:up()
